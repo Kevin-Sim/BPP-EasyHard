@@ -11,6 +11,7 @@ import bppModel.FF;
 import bppModel.Item;
 import bppModel.NF;
 import bppModel.OR3;
+import bppModel.ORH;
 import bppModel.Problem;
 import bppModel.Solution;
 import bppModel.WF;
@@ -70,6 +71,7 @@ public class Individual {
 		algs.add(new AWF());
 		algs.add(new OR3());
 		algs.add(new Weib());
+		algs.add(new ORH());
 //			algs.add(new GpAlg(Serialize.loadNode("bestInRun.node")));			
 
 		return algs;

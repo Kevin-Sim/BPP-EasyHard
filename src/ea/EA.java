@@ -1,5 +1,6 @@
 package ea;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ public class EA implements Runnable {
 	int fileNum = 0;
 
 	/**
-	 * start with 4 args -- AlgName (WF BF FF NF AWF OR3), startProblemNumber,
+	 * start with 4 args -- AlgName (WF BF FF NF AWF OR3, Weib, ORH), startProblemNumber,
 	 * offset (processNumber), numProblemsPerProcess
 	 * 
 	 * @param args
@@ -75,7 +76,7 @@ public class EA implements Runnable {
 				// dont need this but could stop as soon as heuristic is best (or worst)
 				// as soon as best is +ve (heuristic is best stop?
 				// or when best on bins? better
-				// NOte possible to have worst falk but less bins when evolving hard
+				// NOte possible to have worse falk but less bins when evolving hard
 				if (bestInRun == null || getBest().getFitness() > bestInRun.getFitness()) {
 					bestInRun = getBest().copy();
 					printOutput();
@@ -146,7 +147,12 @@ public class EA implements Runnable {
 				problems.add(getBest().problem);
 			}
 			for (Problem p : problems) {
-				StringIO.writeStringToFile("" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName()
+				File directory = new File("Evolved2024/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName());
+				if (!directory.exists()) {
+					directory.mkdir();
+				}
+				String path = directory.getAbsolutePath();
+				StringIO.writeStringToFile(path + "/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName()
 						+ "_" + NumberFormat.formatNumber(fileNum, 4) + ".bpp", p.toString(), false);
 				fileNum++;
 //				System.out.println("saved problem " + fileNum);

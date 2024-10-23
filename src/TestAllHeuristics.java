@@ -75,7 +75,7 @@ public class TestAllHeuristics {
 				sb.append(winners + "," + losers);
 			}
 
-			BufferedWriter writer = new BufferedWriter(new FileWriter(parentDirName + ".csv", false));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(dirName + "/" + parentDirName + ".csv", false));
 			writer.write(sb.toString());
 			writer.close();
 			sb = new StringBuilder();
