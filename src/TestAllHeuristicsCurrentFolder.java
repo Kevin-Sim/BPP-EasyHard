@@ -65,7 +65,7 @@ public class TestAllHeuristicsCurrentFolder {
 				if (s.getBins().size() > loser) {
 					loser = s.getBins().size();
 					losers = alg.getClass().getSimpleName();
-				} else if (s.getBins().size() == winner) {
+				} else if (s.getBins().size() == loser) {
 					losers += " " + alg.getClass().getSimpleName();
 				}
 			}
@@ -77,6 +77,7 @@ public class TestAllHeuristicsCurrentFolder {
 		writer.close();
 		sb = new StringBuilder();
 		System.out.println("finished ");
+		
 
 	}
 }
