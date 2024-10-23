@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Random;
 
+import ea.Individual;
+
 public class Problem {	
 
 	private int pr_capacity = -1;
@@ -147,4 +149,34 @@ public class Problem {
 		}
 		return true;
 	}
+	
+	public double[] getDiversity(Problem p, ArrayList<Problem> otherProblems){
+		double[] diversity = new double[otherProblems.size()];
+		for(Problem aProblem : otherProblems) {
+			for(int i = 0; i < p.items.size(); i++) {
+				if(p.items.get(i).getLength() == aProblem.getItems().get(i).getLength()) {
+					diversity[otherProblems.indexOf(aProblem)] += 1;
+				}
+			}
+		}
+		for(int i = 0; i < diversity.length; i++) {
+			diversity[i] /= items.size();
+		}
+		return diversity;
+		
+	}
+	
+	public double getAverageDiversity(ArrayList<Problem> problems){
+		double sum = 0;
+		Problem p = problems.remove(0);
+		if(problems.size() > 0) {
+			double[] divs = getDiversity(p, problems);
+			for(double d : divs) {
+				sum += d;
+			}
+			return sum / problems.size();
+		}
+		return 1;
+	}
+	
 }

@@ -2,6 +2,7 @@ package ea;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -25,16 +26,17 @@ public class EA implements Runnable {
 	static int start = 0;
 	static int numProblems = 1;
 	int fileNum = 0;
+	Individual bestInRun = null;
 
 	/**
-	 * start with 4 args -- AlgName (WF BF FF NF AWF OR3, Weib, ORH), startProblemNumber,
-	 * offset (processNumber), numProblemsPerProcess
+	 * start with 4 args -- AlgName (WF BF FF NF AWF OR3, Weib, ORH),
+	 * startProblemNumber, offset (processNumber), numProblemsPerProcess
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		if (args == null || args.length == 0) {
-			args = new String[] { "BF", "0", "0", "100" };
+			args = new String[] { "NF", "0", "0", "100" };
 		}
 		try {
 			Class c = Class.forName("bppModel." + args[0]);
@@ -58,110 +60,104 @@ public class EA implements Runnable {
 	public void run() {
 
 		fileNum = 0;
-		outer: for (int i = start; i < start + numProblems;) {
+		for (int i = start; i < start + numProblems; i++) {
 			iteration = 0;
 			initialise();
-			Individual bestInRun = null;
-			inner: while (!stopppingCondition()) {
+			bestInRun = null;
+			while (!stopppingCondition()) {
 				Individual parent1 = select();
 				Individual parent2 = select();
 				Individual child = crossover(parent1, parent2);
-				// only swap mutation maintains distribution but doesn't evolve
-//				Individual child = select();
+//				mutate1(child);
 				mutate2(child);
+//				mutate3(child);
 				calculateFitness(child);
 				replace(child);
 				iteration++;
 
-				// dont need this but could stop as soon as heuristic is best (or worst)
-				// as soon as best is +ve (heuristic is best stop?
-				// or when best on bins? better
-				// NOte possible to have worse falk but less bins when evolving hard
 				if (bestInRun == null || getBest().getFitness() > bestInRun.getFitness()) {
 					bestInRun = getBest().copy();
 					printOutput();
-					ArrayList<AbstractAlgorithm> bestOrWorstAlgs = null;
-					if (bestInRun.fitness > 0) {
-//						System.out.println("positive");
-						if (Parameters.EASY) {
-							bestOrWorstAlgs = getBestAlgs(bestInRun);
-						} else {
-							bestOrWorstAlgs = getWorstAlgs(bestInRun);
-						}
-						// possible to have worst falk but less bins could break when contains rather
-						// than unique
-						if (bestOrWorstAlgs.size() == 1
-								&& bestOrWorstAlgs.get(0).getClass() == Parameters.evolovedForAlgorithm) {
-							// break when unique best
-							break inner;
-						} else {
-							// break when equal best
-							for (AbstractAlgorithm alg : bestOrWorstAlgs) {
-								if (alg.getClass() == Parameters.evolovedForAlgorithm) {
-									break inner;
-								}
-							}
-
-						}
-					}
 				}
 			}
-
-			// save all in pop that are positive ?
-			// replace method does not allow duplicates but
-			// this results in all instances very similar
-			// Added check to see if best unique on bins
-			// better to save only best
-			ArrayList<Problem> problems = new ArrayList<Problem>();
-			for (Individual individual : population) {
-				if (individual.getFitness() > 0) {
-					// check best on bins
-					ArrayList<AbstractAlgorithm> bestOrWorstAlgs;
-					if (Parameters.EASY) {
-						bestOrWorstAlgs = getBestAlgs(individual);
-					} else {
-						bestOrWorstAlgs = getWorstAlgs(individual);
-					}
-
-					if (bestOrWorstAlgs.size() == 1
-							&& bestOrWorstAlgs.get(0).getClass() == Parameters.evolovedForAlgorithm) {
-						// add if best / worst on bins
-						problems.add(individual.problem);
-					} else {
-						// add if best / worst on falk but equal on bins
-						for (AbstractAlgorithm alg : bestOrWorstAlgs) {
-							if (alg.getClass() == Parameters.evolovedForAlgorithm) {
-								problems.add(individual.problem);
-								// System.out.println("didnt uniquely win / lose");
-								break;
-							}
-						}
-					}
-				}
+			if(saveFiles() >= numProblems) {
+				break;
 			}
-
-			// Save all if positive or just best?
-			// Just best seems best as otherwise too similar
-			if (problems.size() > 0) {
-				problems.clear();
-				problems.add(getBest().problem);
-			}
-			for (Problem p : problems) {
-				File directory = new File("Evolved2024/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName());
-				if (!directory.exists()) {
-					directory.mkdir();
-				}
-				String path = directory.getAbsolutePath();
-				StringIO.writeStringToFile(path + "/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName()
-						+ "_" + NumberFormat.formatNumber(fileNum, 4) + ".bpp", p.toString(), false);
-				fileNum++;
-//				System.out.println("saved problem " + fileNum);
-				if (fileNum == numProblems) {
-					break outer;
-				}
-			}
-//			printOutput();
 		}
+	}
+
+	private int saveFiles() {
+		ArrayList<Problem> problems = new ArrayList<Problem>();
+		ArrayList<Individual>  individuals = new ArrayList<Individual>();
+		for (Individual individual : population) {
+			if (individual.getFitness() > 0) {
+				// check best on bins
+				ArrayList<AbstractAlgorithm> bestOrWorstAlgs;
+				if (Parameters.EASY) {
+					bestOrWorstAlgs = getBestAlgs(individual);
+				} else {
+					bestOrWorstAlgs = getWorstAlgs(individual);
+				}
+
+				//probably add params ?
+				if (bestOrWorstAlgs.size() == 1
+						&& bestOrWorstAlgs.get(0).getClass() == Parameters.evolovedForAlgorithm) {
+					// add if best / worst on bins
+					problems.add(individual.problem);
+					individuals.add(individual);
+				} else {
+					// add if best / worst on falk but equal on bins
+					for (AbstractAlgorithm alg : bestOrWorstAlgs) {
+						if (alg.getClass() == Parameters.evolovedForAlgorithm) {
+							if(Parameters.breakOnBestEqual) {
+								problems.add(individual.problem);
+								individuals.add(individual);
+							}							
+						}
+					}
+				}
+			}
+		}
+
+		// Save all if positive or just best?
+		// Just best seems best as otherwise too similar
+		// However if Diversity < 0.2 OK
+		Individual bestIndividual = null;
+		for(Individual ind : individuals) {
+			if(bestIndividual == null || ind.getFitness() > bestIndividual.getFitness()) {
+				bestIndividual = ind;
+			}
+		}
+		if (problems.size() > 0 && Parameters.onlySaveBest) {
+			// diversity?
+//			Problem p = problems.remove(0);
+//			System.out.println(Arrays.toString(p.getDiversity(p, problems)));
+			problems.clear();
+			problems.add(bestIndividual.problem);
+		}
+		for (Problem p : problems) {
+			File directory = new File(
+					"Evolved2024/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName());
+			if (!directory.exists()) {
+				directory.mkdir();
+			}
+			String path = directory.getAbsolutePath();
+			StringIO.writeStringToFile(path + "/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName()
+					+ "_" + NumberFormat.formatNumber(fileNum, 4) + ".bpp", p.toString(), false);
+			fileNum++;
+			if(fileNum >= numProblems) {
+				return fileNum;
+			}
+		}
+		return fileNum;
+	}
+
+	private ArrayList<Problem> getProblems() {
+		ArrayList<Problem> problems = new ArrayList<Problem>();
+		for (Individual ind : population) {
+			problems.add(ind.problem);
+		}
+		return problems;
 	}
 
 	/**
@@ -212,8 +208,10 @@ public class EA implements Runnable {
 	}
 
 	private void printOutput() {
-		System.out.println(
-				fileNum + "\t" + NumberFormat.formatNumber(iteration, 8) + "\t" + getBest() + "\t" + getWorst());
+		ArrayList<Problem> probs = getProblems();
+		Problem p = probs.remove(0);
+		System.out.println(fileNum + "\t" + NumberFormat.formatNumber(iteration, 8) + "\t"
+				+ p.getAverageDiversity(probs) + "\t" + getBest() + "\t" + getWorst());
 	}
 
 	/**
@@ -232,7 +230,11 @@ public class EA implements Runnable {
 				}
 			}
 			if (!exists) {
-				population.set(population.indexOf(individual), child);
+				if(Parameters.DIVERSITY == 1) {
+					population.set(population.indexOf(individual), child);
+				}else if(child.problem.getAverageDiversity(getProblems()) < Parameters.DIVERSITY) {
+					population.set(population.indexOf(individual), child);
+				}
 			}
 		}
 	}
@@ -281,7 +283,7 @@ public class EA implements Runnable {
 	}
 
 	/**
-	 * Swap position of two items (keeps distribution)
+	 * Swap position of two items (keeps distribution if no crossover)
 	 * 
 	 * @param child
 	 */
@@ -294,6 +296,32 @@ public class EA implements Runnable {
 		Item itemTemp = child.problem.getItems().get(idx2);
 		child.problem.getItems().set(idx2, child.problem.getItems().get(idx1));
 		child.problem.getItems().set(idx1, itemTemp);
+	}
+
+	/**
+	 * Move random block
+	 * (keeps distribution if no crossover)
+	 * 
+	 * @param child
+	 */
+	private void mutate3(Individual child) {
+		if (Parameters.random.nextDouble() > Parameters.MUTATION_PROBABILITY) {
+			return;
+		}
+		int idx1 = Parameters.random.nextInt(Parameters.NUM_ITEMS);
+		int idx2 = Parameters.random.nextInt(Parameters.NUM_ITEMS);
+		if (idx1 > idx2) {
+			int temp = idx1;
+			idx1 = idx2;
+			idx2 = temp;
+		}
+		ArrayList<Item> removedItems = new ArrayList<Item>();
+		for (int i = idx1; i < idx2; i++) {
+			removedItems.add(child.problem.getItems().get(i));
+		}
+		
+		child.problem.getItems().removeAll(removedItems);
+		child.problem.getItems().addAll(Parameters.random.nextInt(child.problem.getItems().size()), removedItems);
 	}
 
 	private void calculateFitness(Individual child) {
@@ -338,9 +366,52 @@ public class EA implements Runnable {
 		return individual.copy();
 	}
 
+	// put other criteria in here also
 	private boolean stopppingCondition() {
 		if (iteration >= Parameters.MAX_ITERATIONS) {
 			return true;
+		}
+		if (bestInRun == null) {
+			return false;
+		}
+
+		ArrayList<AbstractAlgorithm> bestOrWorstAlgs = null;
+		if (bestInRun.fitness > 0) {
+//			System.out.println("positive");
+			if (Parameters.EASY) {
+				bestOrWorstAlgs = getBestAlgs(bestInRun);
+			} else {
+				bestOrWorstAlgs = getWorstAlgs(bestInRun);
+			}
+			// possible to have worst falk but less bins could break when contains rather
+			// than unique. Havent managed best unique on Hard ORH
+			if (Parameters.breakOnBestUnique) {
+				if (bestOrWorstAlgs.size() == 1
+						&& bestOrWorstAlgs.get(0).getClass() == Parameters.evolovedForAlgorithm) {
+//				 break when unique best
+					return true;
+				}
+			}
+			if (Parameters.breakOnBestEqual) {
+				// break when equal best. Haven't managed best unique on Hard ORH
+				for (AbstractAlgorithm alg : bestOrWorstAlgs) {
+					if (alg.getClass() == Parameters.evolovedForAlgorithm) {
+						return true;
+					}
+				}
+			}
+		}
+
+		if (Parameters.DIVERSITY == 1) {
+			return false;
+		}
+		ArrayList<Problem> probs = getProblems();
+
+		if (probs.remove(0).getAverageDiversity(probs) > Parameters.DIVERSITY) {
+//			System.out.println("losing diversity");
+			if(Parameters.breakOnDiversity) {
+				return true;
+			}
 		}
 		return false;
 	}

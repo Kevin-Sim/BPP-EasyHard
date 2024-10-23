@@ -17,6 +17,7 @@ import bppModel.Weib;
 import ea.Individual;
 import io.FileGetter;
 import io.ProblemReader;
+import io.StringIO;
 
 public class TestAllHeuristics {
 
@@ -37,6 +38,10 @@ public class TestAllHeuristics {
 			for (AbstractAlgorithm alg : algorithms) {
 				sb.append(alg.getClass().getSimpleName() + ",");
 			}
+			sb.append("winners,losers,");
+			for (AbstractAlgorithm alg : algorithms) {
+				sb.append(alg.getClass().getSimpleName() + ",");
+			}
 			sb.append("winners,losers");
 			int count = 0;		
 			Problem p;
@@ -52,9 +57,9 @@ public class TestAllHeuristics {
 				}
 				p = ProblemReader.getProblem(dirName, filename);
 				sb.append("\r\n" + filename.substring(filename.lastIndexOf('\\') + 1) + "," + p.getPr_opt() + ",");
-				int winner = Integer.MAX_VALUE;
+				double winner = Integer.MAX_VALUE;
 				String winners = "";	
-				int loser = Integer.MIN_VALUE;
+				double loser = Integer.MIN_VALUE;
 				String losers = "";
 				for (AbstractAlgorithm alg : algorithms) {
 					s = new Solution(p);
@@ -72,6 +77,27 @@ public class TestAllHeuristics {
 						losers += " " + alg.getClass().getSimpleName();
 					}
 				}
+				sb.append(winners + "," + losers + ",");
+				winner = Integer.MIN_VALUE;
+				winners = "";	
+				loser = Integer.MAX_VALUE;
+				losers = "";
+				for (AbstractAlgorithm alg : algorithms) {
+					s = new Solution(p);
+					alg.packRemainingItems(s);
+					sb.append(s.getFitness() + ",");
+					if (s.getFitness() > winner) {
+						winner = s.getFitness();
+						winners = alg.getClass().getSimpleName();
+					} else if (s.getFitness() == winner) {
+						winners += " " + alg.getClass().getSimpleName();
+					}if (s.getFitness() < loser) {
+						loser = s.getFitness();
+						losers = alg.getClass().getSimpleName();
+					} else if (s.getFitness() == loser) {
+						losers += " " + alg.getClass().getSimpleName();
+					}
+				}
 				sb.append(winners + "," + losers);
 			}
 
@@ -80,6 +106,56 @@ public class TestAllHeuristics {
 			writer.close();
 			sb = new StringBuilder();
 			System.out.println("finished " + parentDirName);
+//			break;
+		}
+		//add stats
+		for(String dirName : dirNames) {
+			String[] filenames = FileGetter.getFileNames(dirName, "", ".csv");
+			String stats = ",";
+			for(String filename : filenames) {
+				String[] lines = StringIO.readStringsFromFile(dirName + filename);
+				int lineNo = 0;
+				for(int col = 1; col <= Individual.getAlgs().size() + 1; col++) {
+					double sum = 0;
+					lineNo = 0;
+					for(String line : lines) {
+						lineNo++;
+						if(lineNo == 1 || line.equals("")) {
+							continue;
+						}
+						try {
+							sum += Double.parseDouble(line.split(",")[col]);
+						} catch (NumberFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					stats += sum / (lines.length - 1) + ",";
+				}
+				stats += ",,";
+				for(int col = 4 + Individual.getAlgs().size(); col < 4 + 2 * Individual.getAlgs().size(); col++ ) {
+					double sum = 0;
+					lineNo = 0;
+					for(String line : lines) {
+						lineNo++;
+						if(lineNo == 1 || line.equals("")) {
+							continue;
+						}
+						try {
+//							System.out.println(line);
+							sum += Double.parseDouble(line.split(",")[col]);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					stats += sum / (lines.length - 1) + ",";
+				}
+				BufferedWriter writer = new BufferedWriter(new FileWriter(dirName + filename, true));
+				writer.write("\r\nAverage" + stats + "\r\n");
+				writer.close();
+			}
+			
 		}
 	}
 }

@@ -38,8 +38,15 @@ public class Parameters {
 	public static final double CROSSOVER_PROBABILITY = 0.99;
 	public static final double MUTATION_PROBABILITY = 0.02;
 	
-	public static final boolean EASY = false;
+	public static final boolean EASY = true;
 	public static final String PREFIX = getPrefix();
+	//used in replace
+	public static final double DIVERSITY = 1;
+	public static final boolean breakOnDiversity = false;
+	public static final boolean breakOnBestUnique = true;
+	//set to true true to save top best equal
+	public static final boolean breakOnBestEqual = true;
+	public static final boolean onlySaveBest = true;
 	
 	private static String getPrefix() {
 		String str = "";

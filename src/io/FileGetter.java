@@ -37,7 +37,7 @@ public class FileGetter {
 
 				@Override
 				public boolean accept(File dir, String name) {
-					if(name.endsWith(suffix) && name.startsWith(prefix)){
+					if(name.toLowerCase().endsWith(suffix.toLowerCase()) && name.startsWith(prefix)){
 						return true;
 					}else{
 						return false;
