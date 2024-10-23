@@ -1,0 +1,36 @@
+library(readr)
+library(RColorBrewer)
+library(ggplot2)
+library(ggfortify)
+library(reshape2)
+library(svglite)
+
+
+classData <- read_csv("C:/Users/40004938/Desktop/WS/BPP-EasyHard/E_120_.csv")
+#classData <- t(classData)
+classData <- classData[,-c(6)] 
+classData <- classData[-c(1),] ## remove row 1
+matrix <- data.matrix(classData)
+matrix <- matrix[-c(1),] ## remove row 1
+my_pallet   <- colorRampPalette(c("red", "yellow", "green"))(n = 100)
+#my_pallet <- brewer.pal(9, "Blues")
+ab_heatmap <- heatmap(matrix, ylab = "Hello", Rowv=NA, Colv=NA, col = my_pallet, scale="none", margins=c(0,0))
+#dev.off()
+
+
+classData <- read_csv("C:/Users/40004938/Desktop/WS/BPP-EasyHard/E_120_hm.csv")
+df <- classData[c(1,2,3,4,5)]
+df  <- t(df)
+colnames(df) <- c("1", "2", "3", "4", "5")
+color_var = colorRamp(c("green", "blue", "red", "yellow", "brown"))
+ggplot2::autoplot(prcomp(df), data = classData, colour ='Best',label.size = 3)
+
+
+classData <- read.csv("C:/Users/40004938/Desktop/WS/BPP-EasyHard/H_120_FF.csv")
+classData <- melt(classData)
+pl <- ggplot(classData, aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable), notch = TRUE)
+pl <- pl + labs(x="Heuristic", y="Fitness", title="Hard for FF")
+print(pl)
+ggsave("H_120_FF.pdf", pl, width = 4, height = 4)
+ggsave("H_120_FF.svg", pl, width = 4, height = 4)
+ggsave("H_120_FF.png", pl, width = 4, height = 4)
