@@ -22,7 +22,7 @@ import io.StringIO;
 public class TestAllHeuristics {
 
 	public static void main(String[] args) throws IOException {
-		String[] dirNames = FileGetter.getDirNamesRecursive("Evolved2024");
+		String[] dirNames = FileGetter.getDirNamesRecursive("Evolved2024a");
 		
 		StringBuilder sb;
 		ArrayList<AbstractAlgorithm> algorithms;
@@ -32,6 +32,9 @@ public class TestAllHeuristics {
 			String parentDirName = dirName.substring(0, dirName.length() - 1);
 			parentDirName = parentDirName.substring(parentDirName.lastIndexOf('\\') + 1);
 			String[] filenames = FileGetter.getFileNames(dirName, "", ".bpp");
+			if(filenames.length == 0) {
+				continue;
+			}
 			System.out.println(parentDirName + "\t" + filenames.length + " files");
 			sb = new StringBuilder();
 			sb.append("File,Opt L1,");
@@ -111,6 +114,9 @@ public class TestAllHeuristics {
 		//add stats
 		for(String dirName : dirNames) {
 			String[] filenames = FileGetter.getFileNames(dirName, "", ".csv");
+			if(filenames.length == 0) {
+				continue;
+			}
 			String stats = ",";
 			for(String filename : filenames) {
 				String[] lines = StringIO.readStringsFromFile(dirName + filename);

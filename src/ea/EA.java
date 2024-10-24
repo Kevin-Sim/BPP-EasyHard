@@ -24,19 +24,19 @@ public class EA implements Runnable {
 	ArrayList<Individual> population = null;
 	static int iteration = 0;
 	static int start = 0;
-	static int numProblems = 1;
+	static int end = 0;
 	int fileNum = 0;
 	Individual bestInRun = null;
 
 	/**
-	 * start with 4 args -- AlgName (WF BF FF NF AWF OR3, Weib, ORH),
+	 * start with 4 args -- AlgName (BF FF WF NF AWF OR3, Weib, ORH),
 	 * startProblemNumber, offset (processNumber), numProblemsPerProcess
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		if (args == null || args.length == 0) {
-			args = new String[] { "NF", "0", "0", "100" };
+			args = new String[] { "NF", "0", "100" };
 		}
 		try {
 			Class c = Class.forName("bppModel." + args[0]);
@@ -45,9 +45,9 @@ public class EA implements Runnable {
 			 * generate numProbs starting at startNumber + offSet * numProblems -- offset =
 			 * condor process No
 			 */
-			numProblems = Integer.parseInt(args[3]);
-			start = Integer.parseInt(args[1]) + Integer.parseInt(args[2]) * Integer.parseInt(args[3]);
-
+			end = Integer.parseInt(args[2]);
+			start = Integer.parseInt(args[1]);
+	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -59,8 +59,8 @@ public class EA implements Runnable {
 	@Override
 	public void run() {
 
-		fileNum = 0;
-		for (int i = start; i < start + numProblems; i++) {
+		fileNum = start;
+		while (fileNum < end) {
 			iteration = 0;
 			initialise();
 			bestInRun = null;
@@ -80,7 +80,7 @@ public class EA implements Runnable {
 					printOutput();
 				}
 			}
-			if(saveFiles() >= numProblems) {
+			if(saveFiles() >= end) {
 				break;
 			}
 		}
@@ -109,7 +109,7 @@ public class EA implements Runnable {
 					// add if best / worst on falk but equal on bins
 					for (AbstractAlgorithm alg : bestOrWorstAlgs) {
 						if (alg.getClass() == Parameters.evolovedForAlgorithm) {
-							if(Parameters.breakOnBestEqual) {
+							if(Parameters.saveBestEqual) {
 								problems.add(individual.problem);
 								individuals.add(individual);
 							}							
@@ -137,15 +137,15 @@ public class EA implements Runnable {
 		}
 		for (Problem p : problems) {
 			File directory = new File(
-					"Evolved2024/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName());
+					"Evolved2024a/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName());
 			if (!directory.exists()) {
-				directory.mkdir();
+				directory.mkdirs();
 			}
 			String path = directory.getAbsolutePath();
 			StringIO.writeStringToFile(path + "/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName()
 					+ "_" + NumberFormat.formatNumber(fileNum, 4) + ".bpp", p.toString(), false);
 			fileNum++;
-			if(fileNum >= numProblems) {
+			if(fileNum >= end) {
 				return fileNum;
 			}
 		}

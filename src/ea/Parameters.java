@@ -17,8 +17,8 @@ public class Parameters {
 	public static final Random random = new Random();
 	public static final int BIN_CAPACITY = 150;
 	public static final Init INIT_METHOD = Init.GAUSSIAN;
-	public static final int MIN_ITEM_SIZE = 20;
-	public static final int MAX_ITEM_SIZE = 100;
+	public static final int MIN_ITEM_SIZE = 40;
+	public static final int MAX_ITEM_SIZE = 60;
 	/**
 	 * Used for Gaussian distribution during init with above as cut off
 	 */
@@ -31,7 +31,7 @@ public class Parameters {
 	public static final int POP_SIZE = 500;
 	public static Class evolovedForAlgorithm = FF.class;
 	public static final int tournamentSize = 2;
-	public static final int MAX_ITERATIONS = 100000;//was 1000000
+	public static final int MAX_ITERATIONS = 1000000;//was 1000000
 
 	//only valid for mutation1 which isnt used
 	public static final int MAX_MUTATION = 4;
@@ -45,8 +45,10 @@ public class Parameters {
 	public static final boolean breakOnDiversity = false;
 	public static final boolean breakOnBestUnique = true;
 	//set to true true to save top best equal
-	public static final boolean breakOnBestEqual = true;
+	public static final boolean breakOnBestEqual = false;
 	public static final boolean onlySaveBest = true;
+	//allows to continue for maxiters but still save something if no unique on bins
+	public static final boolean saveBestEqual = true;
 	
 	private static String getPrefix() {
 		String str = "";
