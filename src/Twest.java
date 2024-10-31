@@ -3,8 +3,8 @@ import java.util.ArrayList;
 import bppModel.Item;
 import bppModel.Problem;
 import bppModel.Solution;
-import gp.BinSizeTerminalNode;
-import gp.GpAlg;
+import gpNodesArchive.GpAlg;
+import gpNodesArchive.BinSizeTerminalNode;
 import io.FileGetter;
 import io.StringIO;
 

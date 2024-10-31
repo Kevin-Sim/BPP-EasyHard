@@ -1,5 +1,5 @@
 import bppModel.BF;
-import bppModel.OR3;
+import bppModel.FS1;
 import bppModel.Problem;
 import bppModel.Solution;
 import io.FileGetter;
@@ -33,7 +33,7 @@ public class GoogleTest {
 		for(String filename : filenames) {
 			Problem p = ProblemReader.getProblem("./googleWeib/", filename);
 			Solution s = new Solution(p);
-			OR3 alg = new OR3();
+			FS1 alg = new FS1();
 			alg.packRemainingItems(s);
 			total += s.getBins().size();
 //			System.out.println(filename + "\t" + s.getBins().size());

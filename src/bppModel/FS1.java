@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Unlike other heuristics this always has an empty bin that could have 
  * a higher priority than a partially filled one 
  */
-public class OR3 extends AbstractAlgorithm {
+public class FS1 extends AbstractAlgorithm {
 
 	@Override
 	public void packNextItem(Solution solution) {

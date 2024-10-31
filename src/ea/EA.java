@@ -29,14 +29,15 @@ public class EA implements Runnable {
 	Individual bestInRun = null;
 
 	/**
-	 * start with 4 args -- AlgName (BF FF WF NF AWF OR3, Weib, ORH),
-	 * startProblemNumber, offset (processNumber), numProblemsPerProcess
+	 * start with 3 args -- AlgName (FF, BF, WF, NF, AWF, FS1, FS2, FSW, EoC, EoH),
+	 * startProblemNumber, endProblemNumber + 1
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		if (args == null || args.length == 0) {
-			args = new String[] { "NF", "0", "100" };
+			//
+			args = new String[] { "WF", "9", "100" };
 		}
 		try {
 			Class c = Class.forName("bppModel." + args[0]);
@@ -137,12 +138,12 @@ public class EA implements Runnable {
 		}
 		for (Problem p : problems) {
 			File directory = new File(
-					"Evolved2024a/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName());
+					"Instances2024\\Evolved\\" + Parameters.getPrefix() + Parameters.evolovedForAlgorithm.getSimpleName());
 			if (!directory.exists()) {
 				directory.mkdirs();
 			}
 			String path = directory.getAbsolutePath();
-			StringIO.writeStringToFile(path + "/" + Parameters.PREFIX + Parameters.evolovedForAlgorithm.getSimpleName()
+			StringIO.writeStringToFile(path + "/" + Parameters.getPrefix() + Parameters.evolovedForAlgorithm.getSimpleName()
 					+ "_" + NumberFormat.formatNumber(fileNum, 4) + ".bpp", p.toString(), false);
 			fileNum++;
 			if(fileNum >= end) {
@@ -419,7 +420,7 @@ public class EA implements Runnable {
 	private void initialise() {
 		population = new ArrayList<>();
 		for (int i = 0; i < Parameters.POP_SIZE; i++) {
-			population.add(new Individual());
+			population.add(new Individual(false));
 		}
 
 	}

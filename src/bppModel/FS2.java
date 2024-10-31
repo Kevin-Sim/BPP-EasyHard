@@ -12,7 +12,7 @@ import io.ProblemReader;
  * Unlike other heuristics this always has an empty bin that could have a higher
  * priority than a partially filled one
  */
-public class ORH extends AbstractAlgorithm {
+public class FS2 extends AbstractAlgorithm {
 
 	
 	@Override
@@ -46,15 +46,23 @@ public class ORH extends AbstractAlgorithm {
 		scores[validBins.indexOf(bestBin)] -= Math.pow(bestBin.getBinWaste() - item.getLength(), 4);
 				    
 		Bin highestPriorityBin = null;
-		double largestPriority = Integer.MIN_VALUE;
+		double largestPriority = -Double.MAX_VALUE;
 		for (int i = scores.length - 1; i > 0; i--) {
 			if (scores[i] >= largestPriority) {
 				largestPriority = scores[i];
 				highestPriorityBin = validBins.get(i);
 			}
 		}
+		if(scores.length > 0 && scores[0] > largestPriority) {
+			highestPriorityBin = validBins.get(0);
+		}
 		
-		highestPriorityBin.getItems().add(item);
+		try {
+			highestPriorityBin.getItems().add(item);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
@@ -86,7 +94,7 @@ public class ORH extends AbstractAlgorithm {
 		for(String filename : filenames) {
 			Problem p = ProblemReader.getProblem(".\\Instances2024\\googleOR3\\", filename);
 			Solution s = new Solution(p);
-			ORH orh = new ORH();
+			FS2 orh = new FS2();
 			orh.packRemainingItems(s);
 			System.out.println(s.getBins().size() + " bins");
 			sum += s.getBins().size();

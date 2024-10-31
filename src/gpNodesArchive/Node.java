@@ -1,4 +1,4 @@
-package gp;
+package gpNodesArchive;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,11 +14,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import bppModel.AbstractAlgorithm;
-import bppModel.Bin;
 import bppModel.Problem;
 import bppModel.Solution;
-import gp.GpAlg;
-import gp.GpParameters;
 
 /**
  * 
@@ -49,7 +46,7 @@ public abstract class Node implements Serializable {
 		this.ID = id;
 	}
 
-	public abstract Boolean eval();
+	public abstract Double eval();
 
 	public String toGraphviz() {
 		String result = "";
@@ -355,52 +352,26 @@ public abstract class Node implements Serializable {
 	public double getFitness() {
 		if (fitness == -1) {
 			double d = 0;
-			//AbstractAlgorithm alg = new GpAlg(this);
+			AbstractAlgorithm alg = new GpAlg(this);
 			for (Problem p : GpParameters.problems) {
-				System.out.print(p.getFilename() + "\t");
 				Solution s = new Solution(p);
-				Wrapper.solution = s;
-				while(eval()) {
-					
-				}
-				ArrayList<Bin> emptyBins = new ArrayList<Bin>();
-				for (Bin bin : s.getBins()) {
-					if (bin.getBinLength() == 0) {
-						emptyBins.add(bin);
-					}
-				}
-				s.getBins().removeAll(emptyBins);
-				//alg.packRemainingItems(s);
+				alg.packRemainingItems(s);
 				d += s.getFitness();
-				System.out.println(s.getFitness());
 			}
 			fitness = d;
-			
 		}
-		
 		return fitness;
 	}
-	
+
 	public int getTotalBins() {
 
 		int d = 0;
 		AbstractAlgorithm alg = new GpAlg(this);
 		for (Problem p : GpParameters.problems) {
 			Solution s = new Solution(p);
-			Wrapper.solution = s;
-			while(eval()) {
-				
-			}
-			ArrayList<Bin> emptyBins = new ArrayList<Bin>();
-			for (Bin bin : s.getBins()) {
-				if (bin.getBinLength() == 0) {
-					emptyBins.add(bin);
-				}
-			}
-			s.getBins().removeAll(emptyBins);
+			alg.packRemainingItems(s);
 			d += s.getBins().size();
 		}
 		return d;
 	}
-
 }

@@ -1,4 +1,4 @@
-package io;
+package gp;
 
 
 
@@ -19,7 +19,7 @@ public class Serialize {
 	 * @param problem
 	 * @param filename
 	 */
-	public static void saveNode(gpNodesArchive.Node node, String filename) {		
+	public static void saveNode(Node node, String filename) {		
 		try {
 			FileOutputStream fileOut = new FileOutputStream(filename);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);

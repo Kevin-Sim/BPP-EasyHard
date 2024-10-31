@@ -32,6 +32,7 @@ public class StringIO {
 			while((line = reader.readLine()) != null){
 				fileData.add(line);
 			}
+			reader.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

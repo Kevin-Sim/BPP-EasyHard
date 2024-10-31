@@ -1,6 +1,7 @@
-package gp;
+package gpNodesArchive;
 
 import io.Execute;
+import io.Serialize;
 import io.StringIO;
 
 import java.util.ArrayList;
@@ -124,10 +125,10 @@ public class GP extends Observable implements Runnable{
 	}
 
 	private Node getBest() {
-		Node best = null;
-		double bestFitness = Integer.MAX_VALUE;
+		Node best = population.get(0);
+		double bestFitness = best.getFitness();
 		for (Node n : population) {
-			if (best == null || n.getFitness() < bestFitness) {
+			if (n.getFitness() > bestFitness) {
 				bestFitness = n.getFitness();
 				best = n;
 			}
@@ -225,7 +226,7 @@ public class GP extends Observable implements Runnable{
 			population = newPopulation;
 			bestInGeneration = getBest();
 			
-			if (bestInGeneration.getFitness() < bestInRun.getFitness()) {
+			if (bestInGeneration.getFitness() > bestInRun.getFitness()) {
 				bestInRun = bestInGeneration.copy(null);					
 			}
 			

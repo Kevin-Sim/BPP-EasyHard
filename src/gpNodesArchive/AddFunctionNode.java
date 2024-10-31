@@ -1,4 +1,7 @@
-package gp;
+package gpNodesArchive;
+
+import gpNodesArchive.FunctionNode;
+import gpNodesArchive.Node;
 
 public class AddFunctionNode extends FunctionNode {
 

@@ -11,10 +11,7 @@ import io.ProblemReader;
  * Unlike other heuristics this always has an empty bin that could have a higher
  * priority than a partially filled one
  */
-public class Weib extends AbstractAlgorithm {
-
-	
-	
+public class FSW extends AbstractAlgorithm {
 
 	@Override
 	public void packNextItem(Solution solution) {
@@ -42,7 +39,7 @@ public class Weib extends AbstractAlgorithm {
 		}
 
 		Bin highestPriorityBin = null;
-		double largestPriority = Integer.MIN_VALUE;
+		double largestPriority = -Double.MAX_VALUE;
 		for (int i = scores.length - 1; i > 0; i--) {
 			scores[i] = scores[i] - scores[i - 1];
 			if (scores[i] >= largestPriority) {
@@ -50,8 +47,16 @@ public class Weib extends AbstractAlgorithm {
 				highestPriorityBin = validBins.get(i);
 			}
 		}
-		
-		highestPriorityBin.getItems().add(item);
+		//fix 
+		if(scores.length > 0 && scores[0] > largestPriority) {
+			highestPriorityBin = validBins.get(0);
+		}
+		try {
+			highestPriorityBin.getItems().add(item);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
@@ -80,7 +85,7 @@ public class Weib extends AbstractAlgorithm {
 		// 2019 for first i get 2335
 		Problem p = ProblemReader.getProblem("", "weib00.bpp");
 		Solution s = new Solution(p);
-		Weib weib = new Weib();
+		FSW weib = new FSW();
 		weib.packRemainingItems(s);
 		System.out.println(s.getBins().size() + " bins");
 

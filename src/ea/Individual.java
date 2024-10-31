@@ -7,15 +7,17 @@ import java.util.HashMap;
 import bppModel.AWF;
 import bppModel.AbstractAlgorithm;
 import bppModel.BF;
+import bppModel.EoC;
+import bppModel.EoH;
 import bppModel.FF;
 import bppModel.Item;
 import bppModel.NF;
-import bppModel.OR3;
-import bppModel.ORH;
+import bppModel.FS1;
+import bppModel.FS2;
 import bppModel.Problem;
 import bppModel.Solution;
 import bppModel.WF;
-import bppModel.Weib;
+import bppModel.FSW;
 import ea.Parameters.Init;
 import gp.GpAlg;
 import io.Serialize;
@@ -28,8 +30,8 @@ public class Individual {
 	Class actualBest = null;
 	double fitness = -1;
 	private Class actualWorst;
-
-	public Individual() {
+	
+	public Individual(boolean calcFitness) {
 		ArrayList<Item> items = new ArrayList<>();
 		for (int i = 0; i < Parameters.NUM_ITEMS; i++) {
 			Item item = null;
@@ -39,8 +41,8 @@ public class Individual {
 			} else if (Parameters.INIT_METHOD == Init.GAUSSIAN) {
 				int val = -1;
 				while (val < Parameters.MIN_ITEM_SIZE || val > Parameters.MAX_ITEM_SIZE) {
-					val = (int) (Parameters.MEAN_ITEM_SIZE
-							+ Parameters.STANDARD_DEVIATION * Parameters.random.nextGaussian());
+					val = (int) (Parameters.getMEAN_ITEM_SIZE()
+							+ Parameters.getSTANDARD_DEVIATION() * Parameters.random.nextGaussian());
 				}
 				item = new Item(val);
 			}
@@ -48,9 +50,13 @@ public class Individual {
 		}
 
 		problem = new Problem(Parameters.BIN_CAPACITY, items);
-		evolvedFor = Parameters.evolovedForAlgorithm;
-		getFitness();
+		if(calcFitness) {
+			evolvedFor = Parameters.evolovedForAlgorithm;
+			getFitness();
+		}
 	}
+
+	private Individual() {}
 
 	/**
 	 * used with null to create empty
@@ -69,9 +75,11 @@ public class Individual {
 		algs.add(new WF());
 		algs.add(new NF());
 		algs.add(new AWF());
-		algs.add(new OR3());
-		algs.add(new Weib());
-		algs.add(new ORH());
+		algs.add(new FS1());
+		algs.add(new FS2());
+		algs.add(new FSW());
+		algs.add(new EoC());
+		algs.add(new EoH());
 //			algs.add(new GpAlg(Serialize.loadNode("bestInRun.node")));			
 
 		return algs;
@@ -198,4 +206,9 @@ public class Individual {
 		return individual;
 	}
 
+	public static void main(String[] args) {
+		for(AbstractAlgorithm alg : getAlgs()) {
+			System.out.print(alg.getClass().getSimpleName() + ", ");
+		}
+	}
 }

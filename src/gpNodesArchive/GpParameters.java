@@ -1,4 +1,4 @@
-package gp;
+package gpNodesArchive;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -53,7 +53,7 @@ public class GpParameters {
 	
 	private static ArrayList<Problem> getProblems() {
 		ArrayList<Problem> problems = new ArrayList<>();
-		String path = "./Evolved2024/E_120_N_20_100_BF/";
+		String path = "./google/";
 		String prefix = "E_120_" + algorithmClass.getSimpleName();	
 		prefix = "";
 //		String path = "";

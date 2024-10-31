@@ -1,4 +1,8 @@
-package gp;
+package gpNodesArchive;
+
+import gpNodesArchive.GpParameters;
+import gpNodesArchive.Node;
+import gpNodesArchive.TerminalNode;
 
 public class DoubleTerminalNode extends TerminalNode{	
 

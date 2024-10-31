@@ -8,12 +8,12 @@ import bppModel.AWF;
 import bppModel.AbstractAlgorithm;
 import bppModel.BF;
 import bppModel.FF;
-import bppModel.OR3;
+import bppModel.FS1;
 import bppModel.NF;
 import bppModel.Problem;
 import bppModel.Solution;
 import bppModel.WF;
-import bppModel.Weib;
+import bppModel.FSW;
 import ea.Individual;
 import io.FileGetter;
 import io.ProblemReader;
@@ -22,17 +22,19 @@ import io.StringIO;
 public class TestAllHeuristics {
 
 	public static void main(String[] args) throws IOException {
-		String[] dirNames = FileGetter.getDirNamesRecursive("Evolved2024a");
-		
+//		String[] dirNames = FileGetter.getDirNamesRecursive("Evolved2024a");
+		String[] dirNames = FileGetter.getDirNamesRecursive("C:\\Users\\Kev\\Dropbox\\Laptop\\BPPWS\\BPP-EasyHard\\Inst");
+
 		StringBuilder sb;
 		ArrayList<AbstractAlgorithm> algorithms;
+		
 		for (String dirName : dirNames) {
 			System.out.println(dirName);
 			algorithms = Individual.getAlgs();
 			String parentDirName = dirName.substring(0, dirName.length() - 1);
 			parentDirName = parentDirName.substring(parentDirName.lastIndexOf('\\') + 1);
 			String[] filenames = FileGetter.getFileNames(dirName, "", ".bpp");
-			if(filenames.length == 0) {
+			if (filenames.length == 0) {
 				continue;
 			}
 			System.out.println(parentDirName + "\t" + filenames.length + " files");
@@ -46,14 +48,17 @@ public class TestAllHeuristics {
 				sb.append(alg.getClass().getSimpleName() + ",");
 			}
 			sb.append("winners,losers");
-			int count = 0;		
+			int count = 0;
 			Problem p;
-			Solution s ;
+			Solution s;
 			for (String filename : filenames) {
+//				algorithms = Individual.getAlgs();
 				count++;
-				//fixes issue with slow down after 1000 problems no idea why it slows but creating new algs fixes it
-				//only prob on office pc?
-				if(count % 100 == 0) {
+				System.out.println(count + "  of  " + filenames.length + "\t" + dirName + filename);
+				// fixes issue with slow down after 1000 problems no idea why it slows but
+				// creating new algs fixes it
+				// only prob on office pc?
+				if (count % 1 == 0) {
 //					System.out.println(parentDirName + "\t" + count );
 //					System.gc();
 //					algorithms = Individual.getAlgs();
@@ -61,7 +66,7 @@ public class TestAllHeuristics {
 				p = ProblemReader.getProblem(dirName, filename);
 				sb.append("\r\n" + filename.substring(filename.lastIndexOf('\\') + 1) + "," + p.getPr_opt() + ",");
 				double winner = Integer.MAX_VALUE;
-				String winners = "";	
+				String winners = "";
 				double loser = Integer.MIN_VALUE;
 				String losers = "";
 				for (AbstractAlgorithm alg : algorithms) {
@@ -73,7 +78,8 @@ public class TestAllHeuristics {
 						winners = alg.getClass().getSimpleName();
 					} else if (s.getBins().size() == winner) {
 						winners += " " + alg.getClass().getSimpleName();
-					}if (s.getBins().size() > loser) {
+					}
+					if (s.getBins().size() > loser) {
 						loser = s.getBins().size();
 						losers = alg.getClass().getSimpleName();
 					} else if (s.getBins().size() == loser) {
@@ -82,7 +88,7 @@ public class TestAllHeuristics {
 				}
 				sb.append(winners + "," + losers + ",");
 				winner = Integer.MIN_VALUE;
-				winners = "";	
+				winners = "";
 				loser = Integer.MAX_VALUE;
 				losers = "";
 				for (AbstractAlgorithm alg : algorithms) {
@@ -94,7 +100,8 @@ public class TestAllHeuristics {
 						winners = alg.getClass().getSimpleName();
 					} else if (s.getFitness() == winner) {
 						winners += " " + alg.getClass().getSimpleName();
-					}if (s.getFitness() < loser) {
+					}
+					if (s.getFitness() < loser) {
 						loser = s.getFitness();
 						losers = alg.getClass().getSimpleName();
 					} else if (s.getFitness() == loser) {
@@ -109,24 +116,24 @@ public class TestAllHeuristics {
 			writer.close();
 			sb = new StringBuilder();
 			System.out.println("finished " + parentDirName);
-//			break;
+			//break;
 		}
-		//add stats
-		for(String dirName : dirNames) {
+		// add stats average
+		for (String dirName : dirNames) {
 			String[] filenames = FileGetter.getFileNames(dirName, "", ".csv");
-			if(filenames.length == 0) {
+			if (filenames.length == 0) {
 				continue;
 			}
 			String stats = ",";
-			for(String filename : filenames) {
+			for (String filename : filenames) {
 				String[] lines = StringIO.readStringsFromFile(dirName + filename);
 				int lineNo = 0;
-				for(int col = 1; col <= Individual.getAlgs().size() + 1; col++) {
+				for (int col = 1; col <= Individual.getAlgs().size() + 1; col++) {
 					double sum = 0;
 					lineNo = 0;
-					for(String line : lines) {
+					for (String line : lines) {
 						lineNo++;
-						if(lineNo == 1 || line.equals("")) {
+						if (lineNo == 1 || line.equals("")) {
 							continue;
 						}
 						try {
@@ -139,12 +146,12 @@ public class TestAllHeuristics {
 					stats += sum / (lines.length - 1) + ",";
 				}
 				stats += ",,";
-				for(int col = 4 + Individual.getAlgs().size(); col < 4 + 2 * Individual.getAlgs().size(); col++ ) {
+				for (int col = 4 + Individual.getAlgs().size(); col < 4 + 2 * Individual.getAlgs().size(); col++) {
 					double sum = 0;
 					lineNo = 0;
-					for(String line : lines) {
+					for (String line : lines) {
 						lineNo++;
-						if(lineNo == 1 || line.equals("")) {
+						if (lineNo == 1 || line.equals("")) {
 							continue;
 						}
 						try {
@@ -161,7 +168,54 @@ public class TestAllHeuristics {
 				writer.write("\r\nAverage" + stats + "\r\n");
 				writer.close();
 			}
-			
+//			break;
+		}
+		// add stats excess
+		for (String dirName : dirNames) {
+			String[] filenames = FileGetter.getFileNames(dirName, "", ".csv");
+			if (filenames.length == 0) {
+				continue;
+			}
+			String stats = ",";
+			for (String filename : filenames) {
+				String[] lines = StringIO.readStringsFromFile(dirName + filename);
+				String lastLine = lines[lines.length - 1];
+				//System.out.println(lastLine);
+				double lb = Double.parseDouble(lastLine.split(",")[1]);
+				for (int col = 2; col <= Individual.getAlgs().size() + 1; col++) {
+					double avg = 0;
+					try {
+						avg = Double.parseDouble(lastLine.split(",")[col]);
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					stats += String.format("%.2f", 100 * (avg - lb) / lb) + ",";
+				}
+//				stats += ",,";
+//				for (int col = 4 + Individual.getAlgs().size(); col < 4 + 2 * Individual.getAlgs().size(); col++) {
+//					double sum = 0;
+//					lineNo = 0;
+//					for (String line : lines) {
+//						lineNo++;
+//						if (lineNo == 1 || line.equals("")) {
+//							continue;
+//						}
+//						try {
+////								System.out.println(line);
+//							sum += Double.parseDouble(line.split(",")[col]);
+//						} catch (Exception e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//					}
+//					stats += sum / (lines.length - 1) + ",";
+//				}
+				BufferedWriter writer = new BufferedWriter(new FileWriter(dirName + filename, true));
+				writer.write("Excess," + stats + "\r\n");
+				writer.close();
+			}
+//			break;
 		}
 	}
 }

@@ -48,9 +48,9 @@ public class Problem {
 		return pr_opt;
 	}
 
-	public int getTotalItemLength() {
+	public long getTotalItemLength() {
 		try {
-			int result = 0;
+			long result = 0;
 			for (Item item : getItems()) {
 				result += item.getLength();
 			}
