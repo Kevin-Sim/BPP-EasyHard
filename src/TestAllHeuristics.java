@@ -23,11 +23,11 @@ public class TestAllHeuristics {
 
 	public static void main(String[] args) throws IOException {
 //		String[] dirNames = FileGetter.getDirNamesRecursive("Evolved2024a");
-		String[] dirNames = FileGetter.getDirNamesRecursive("C:\\Users\\Kev\\Dropbox\\Laptop\\BPPWS\\BPP-EasyHard\\Inst");
+		String[] dirNames = FileGetter.getDirNamesRecursive("C:\\Users\\Kev\\Dropbox\\Laptop\\BPPWS\\BPP-EasyHard\\zz\\");
 
 		StringBuilder sb;
 		ArrayList<AbstractAlgorithm> algorithms;
-		
+		//10.39
 		for (String dirName : dirNames) {
 			System.out.println(dirName);
 			algorithms = Individual.getAlgs();
@@ -111,7 +111,7 @@ public class TestAllHeuristics {
 				sb.append(winners + "," + losers);
 			}
 
-			BufferedWriter writer = new BufferedWriter(new FileWriter(dirName + "/" + parentDirName + ".csv", false));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(dirName + "/" + parentDirName + "IR.csv", false));
 			writer.write(sb.toString());
 			writer.close();
 			sb = new StringBuilder();
@@ -120,7 +120,7 @@ public class TestAllHeuristics {
 		}
 		// add stats average
 		for (String dirName : dirNames) {
-			String[] filenames = FileGetter.getFileNames(dirName, "", ".csv");
+			String[] filenames = FileGetter.getFileNames(dirName, "", "IR.csv");
 			if (filenames.length == 0) {
 				continue;
 			}
@@ -172,7 +172,7 @@ public class TestAllHeuristics {
 		}
 		// add stats excess
 		for (String dirName : dirNames) {
-			String[] filenames = FileGetter.getFileNames(dirName, "", ".csv");
+			String[] filenames = FileGetter.getFileNames(dirName, "", "IR.csv");
 			if (filenames.length == 0) {
 				continue;
 			}

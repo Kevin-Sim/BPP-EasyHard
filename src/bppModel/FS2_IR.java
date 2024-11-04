@@ -5,17 +5,27 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import io.FileGetter;
 import io.ProblemReader;
 
 /**
  * Unlike other heuristics this always has an empty bin that could have a higher
  * priority than a partially filled one
- */
-public class FSW extends AbstractAlgorithm {
+ * 
+ * score = 5443 * np.ones(bins.shape)
+    score -= bins * (bins-item) # Extract index of bin with best fit.
+    index = np.argmin(bins) # Scale score of best fit bin by item size.
+    score[index] *= item # Penalize best fit bin if fit is not tight.
+    score[index] -= (bins[index] - item)**5
+    return score
 
+ */
+public class FS2_IR extends AbstractAlgorithm {
+
+	
 	@Override
 	public void packNextItem(Solution solution) {
-		int max_bin_cap = solution.getProblem().getPr_capacity();
+		
 		Item item = solution.getRemainingItems().remove(0);
 		ArrayList<Bin> validBins = new ArrayList<Bin>();
 		for (int i = 0; i < solution.getBins().size(); i++) {
@@ -27,30 +37,34 @@ public class FSW extends AbstractAlgorithm {
 			validBins.add(bin);
 		}
 		double[] scores = new double[validBins.size()];
+		Bin bestBin = null;
 		for (int i = 0; i < scores.length; i++) {
 			Bin bin = validBins.get(i);
-			scores[i] = Math.pow(bin.getBinWaste() - max_bin_cap, 2) / item.getLength();
-			scores[i] += Math.pow(bin.getBinWaste(), 2) / Math.pow(item.getLength(), 2); 
-			scores[i] += Math.pow(bin.getBinWaste(), 2) / Math.pow(item.getLength(), 3);
-			if(bin.getBinWaste() > item.getLength()) {
-				scores[i] = -scores[i];
+			scores[i] = 5443;
+		    //Penalize bins with large capacities.
+			scores[i] -= bin.getBinWaste() * (bin.getBinWaste() - item.getLength());
+			//Extract index of bin with best fit.
+			if(bestBin == null || bin.getBinWaste() < bestBin.getBinWaste()) {
+				bestBin = bin;
 			}
-
 		}
-
+		// Scale score of best fit bin by item size.
+		scores[validBins.indexOf(bestBin)] *= item.getLength();
+		//Penalize best fit bin if fit is not tight.
+		scores[validBins.indexOf(bestBin)] -= Math.pow(bestBin.getBinWaste() - item.getLength(), 5);
+				    
 		Bin highestPriorityBin = null;
 		double largestPriority = -Double.MAX_VALUE;
 		for (int i = scores.length - 1; i > 0; i--) {
-			scores[i] = scores[i] - scores[i - 1];
 			if (scores[i] >= largestPriority) {
 				largestPriority = scores[i];
 				highestPriorityBin = validBins.get(i);
 			}
 		}
-		//fix 
 		if(scores.length > 0 && scores[0] > largestPriority) {
 			highestPriorityBin = validBins.get(0);
 		}
+		
 		try {
 			highestPriorityBin.getItems().add(item);
 		} catch (Exception e) {
@@ -82,12 +96,18 @@ public class FSW extends AbstractAlgorithm {
 	}
 
 	public static void main(String[] args) throws IOException {
-		// 2019 for first i get 2335
-		Problem p = ProblemReader.getProblem("", "weib00.bpp");
-		Solution s = new Solution(p);
-		FSW weib = new FSW();
-		weib.packRemainingItems(s);
-		System.out.println(s.getBins().size() + " bins");
+		// 209.7 avg
+		String[] filenames = FileGetter.getFileNames(".\\Instances2024\\googleOR3", "", ".bpp");
+		double sum = 0;
+		for(String filename : filenames) {
+			Problem p = ProblemReader.getProblem(".\\Instances2024\\googleOR3\\", filename);
+			Solution s = new Solution(p);
+			FS2_IR orh = new FS2_IR();
+			orh.packRemainingItems(s);
+			System.out.println(s.getBins().size() + " bins");
+			sum += s.getBins().size();
+		}
+		System.out.println("Avg = " + sum / filenames.length);
 
 	}
 }

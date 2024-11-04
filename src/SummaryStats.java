@@ -4,10 +4,10 @@ import io.StringIO;
 public class SummaryStats {
 
 	public static void main(String[] args) {
-		String[] dirNames = FileGetter.getDirNamesRecursive("Evolved2024a");
+		String[] dirNames = FileGetter.getDirNamesRecursive("C:\\Users\\Kev\\Dropbox\\Laptop\\BPPWS\\BPP-EasyHard\\Instances2024\\IndependentBenchmarks");
 		int fileNum = 0;
 		for(String dirName : dirNames) {
-			String[] filenames = FileGetter.getFileNames(dirName, "", ".csv");
+			String[] filenames = FileGetter.getFileNames(dirName, "", "IR.csv");
 			if(filenames.length == 0) {
 				continue;
 			}
@@ -24,7 +24,7 @@ public class SummaryStats {
 				dirName.replace("\\", "\\\\");
 				String[] parentDirs = dirName.split("\\\\");
 				String parentDir = parentDirs[parentDirs.length - 1];
-				String lastLine = lines[lines.length - 1].replace("Average,", "");
+				String lastLine = lines[lines.length - 1].replace("Excess,", "");
 				System.out.println(parentDir + "," + lastLine);
 			}
 		}

@@ -9,17 +9,22 @@ import bppModel.AbstractAlgorithm;
 import bppModel.BF;
 import bppModel.EoC;
 import bppModel.EoH;
+import bppModel.EoH_IR;
 import bppModel.FF;
 import bppModel.Item;
 import bppModel.NF;
 import bppModel.FS1;
+import bppModel.FS1_IR;
 import bppModel.FS2;
+import bppModel.FS2_IR;
 import bppModel.Problem;
 import bppModel.Solution;
 import bppModel.WF;
 import bppModel.FSW;
+import bppModel.FSW_IR;
 import ea.Parameters.Init;
 import gp.GpAlg;
+import io.ProblemReader;
 import io.Serialize;
 import io.StringIO;
 
@@ -80,6 +85,10 @@ public class Individual {
 		algs.add(new FSW());
 		algs.add(new EoC());
 		algs.add(new EoH());
+		algs.add(new FS1_IR());
+		algs.add(new FS2_IR());
+		algs.add(new FSW_IR());
+		algs.add(new EoH_IR());
 //			algs.add(new GpAlg(Serialize.loadNode("bestInRun.node")));			
 
 		return algs;
@@ -207,8 +216,15 @@ public class Individual {
 	}
 
 	public static void main(String[] args) {
+		Problem p = ProblemReader.getProblem("C:\\Users\\Kev\\Dropbox\\Laptop\\BPPWS\\BPP-EasyHard\\WeibullNew\\WC_100N_100000\\", "WC_100N_100000_00.bpp");
 		for(AbstractAlgorithm alg : getAlgs()) {
 			System.out.print(alg.getClass().getSimpleName() + ", ");
 		}
+//		for(AbstractAlgorithm alg : getAlgs()) {
+//			Solution s = new Solution(p);
+//			long start = System.currentTimeMillis();
+//			alg.packRemainingItems(s);
+//			System.out.println(alg.getClass().getSimpleName() + "\t" + s.getBins().size() + "\t"  + (System.currentTimeMillis() - start));
+//		}
 	}
 }

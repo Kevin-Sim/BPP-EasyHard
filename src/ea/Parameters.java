@@ -58,9 +58,10 @@ public class Parameters {
 	public static final boolean breakOnBestUnique = true;
 	//set to true true to save top best equal
 	public static final boolean breakOnBestEqual = false;
-	//rather than everything good
+	//rather than everything good which is bad as no diversity
 	public static final boolean onlySaveBest = true;
-	//allows to continue for maxiters but still save something if no unique on bins
+	//allows to continue for maxiters if breakOnBestEqual false but still save something 
+	//if no unique on bins but best falk
 	public static final boolean saveBestEqual = false;
 	
 	public static String getPrefix() {

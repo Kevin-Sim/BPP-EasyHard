@@ -10,8 +10,16 @@ import io.ProblemReader;
 /**
  * Unlike other heuristics this always has an empty bin that could have a higher
  * priority than a partially filled one
+ * 
+ * max_bin_cap = max(bins)
+    score = (bins - max_bin_cap)**2 / item + bins**4 / (item**5)
+    score += bins**4 / item**7
+    score[bins > item] = -score[bins > item]
+    score[1:] -= score[:-1]
+    return score
+
  */
-public class FSW extends AbstractAlgorithm {
+public class FSW_IR extends AbstractAlgorithm {
 
 	@Override
 	public void packNextItem(Solution solution) {
@@ -30,12 +38,14 @@ public class FSW extends AbstractAlgorithm {
 		for (int i = 0; i < scores.length; i++) {
 			Bin bin = validBins.get(i);
 			scores[i] = Math.pow(bin.getBinWaste() - max_bin_cap, 2) / item.getLength();
-			scores[i] += Math.pow(bin.getBinWaste(), 2) / Math.pow(item.getLength(), 2); 
-			scores[i] += Math.pow(bin.getBinWaste(), 2) / Math.pow(item.getLength(), 3);
+			scores[i] += Math.pow(bin.getBinWaste(), 4) / Math.pow(item.getLength(), 2);
+			scores[i] += Math.pow(bin.getBinWaste(), 4) / Math.pow(item.getLength(), 7);
+			if (scores[i] <= 0){
+				System.err.println();
+			}
 			if(bin.getBinWaste() > item.getLength()) {
 				scores[i] = -scores[i];
 			}
-
 		}
 
 		Bin highestPriorityBin = null;
@@ -85,7 +95,7 @@ public class FSW extends AbstractAlgorithm {
 		// 2019 for first i get 2335
 		Problem p = ProblemReader.getProblem("", "weib00.bpp");
 		Solution s = new Solution(p);
-		FSW weib = new FSW();
+		FSW_IR weib = new FSW_IR();
 		weib.packRemainingItems(s);
 		System.out.println(s.getBins().size() + " bins");
 

@@ -29,7 +29,7 @@ public class EA implements Runnable {
 	Individual bestInRun = null;
 
 	/**
-	 * start with 3 args -- AlgName (FF, BF, WF, NF, AWF, FS1, FS2, FSW, EoC, EoH),
+	 * start with 3 args -- AlgName (FF, BF, WF, NF, AWF, FS1, FS2, FSW, EoC, EoH, ),
 	 * startProblemNumber, endProblemNumber + 1
 	 * 
 	 * @param args
@@ -37,7 +37,7 @@ public class EA implements Runnable {
 	public static void main(String[] args) {
 		if (args == null || args.length == 0) {
 			//
-			args = new String[] { "WF", "9", "100" };
+			args = new String[] { "NF", "0", "100" };
 		}
 		try {
 			Class c = Class.forName("bppModel." + args[0]);
